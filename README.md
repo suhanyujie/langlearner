@@ -8,7 +8,7 @@ This is a simple language learning app. It is a web app that allows users to lea
 
 ## screenshot
 
-- [](./docs/img1/app-screenshot1.png)
+- ![](./docs/img1/app-screenshot1.png)
 
 ## 技术栈
 
