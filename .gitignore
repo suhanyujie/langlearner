@@ -1,0 +1,8 @@
+build/bin
+node_modules
+frontend/dist
+.idea
+
+# Ignore node_modules
+node_modules
+frontend/node_modules
