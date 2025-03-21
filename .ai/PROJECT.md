@@ -12,6 +12,8 @@
 
 - 使用 FluentUI 组件库以及 tailwindcss v3 进行布局和样式设计。
 - Go 后端实现核心功能
+  - restful 接口文档位于 `.ai/apiDoc` 目录下。
+  - 数据库使用 sqlite，orm 使用 gorm
 - 确保代码按模块划分以便于后期的可维护性和可扩展性。
 
 ## 已完成的功能
