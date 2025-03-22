@@ -6,10 +6,9 @@ import {
   Input,
   makeStyles,
   tokens,
-  MessageBar,
-  MessageBarBody,
   Label,
 } from '@fluentui/react-components';
+import { useNotification } from './NotificationContext.tsx';
 import { Delete24Regular } from '@fluentui/react-icons';
 import * as tagApi from '../../wailsjs/go/services/TagServiceImpl.js';
 
@@ -80,23 +79,22 @@ export const TagManagement: React.FC<TagManagementProps> = ({
   const [newTagName, setNewTagName] = React.useState('');
   const [nextId, setNextId] = React.useState(1);
   const [editingTagName, setEditingTag] = React.useState<string | null>(null);
-  const [error, setError] = React.useState<string | null>(null);
-  const [success, setSuccess] = React.useState<string | null>(null);
+  const { showNotification } = useNotification();
 
-  React.useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (error || success) {
-      timer = setTimeout(() => {
-        setError(null);
-        setSuccess(null);
-      }, 3000);
-    }
-    return () => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-    };
-  }, [error, success]);
+  // React.useEffect(() => {
+  //   let timer: NodeJS.Timeout;
+  //   if (error || success) {
+  //     timer = setTimeout(() => {
+  //       setError(null);
+  //       setSuccess(null);
+  //     }, 3000);
+  //   }
+  //   return () => {
+  //     if (timer) {
+  //       clearTimeout(timer);
+  //     }
+  //   };
+  // }, [error, success]);
 
   const styles = useStyles();
 
@@ -120,24 +118,19 @@ export const TagManagement: React.FC<TagManagementProps> = ({
         )
       );
     } else {
-      const newTag = { id: nextId, name: newTagName };
-      const res = createTag(newTag.name);
-      res.then((res) => {
-        if (res.hasOwnProperty('success') && res['success'] === 0) {
-          setError(res['msg']);
-          setSuccess(null);
+      createTag(newTagName).then((data) => {
+        console.log(data);
+        if (data.hasOwnProperty('success') && data['success'] === 0) {
+          showNotification('error', data['msg']);
           return;
-        } else {
-          setError(null);
-          setSuccess('标签创建成功');
-          // 重置输入框
-          setNewTagName('');
-          setEditingTag(null);
         }
-      });
 
-      setNextId(nextId + 1);
-      onTagsChange([...tags, newTag]);
+        const newTag = { id: data.data.id, name: newTagName };
+        showNotification('success', '标签创建成功');
+        setNewTagName('');
+        setEditingTag(null);
+        onTagsChange([...tags, newTag]);
+      });
     }
   };
 
@@ -175,18 +168,6 @@ export const TagManagement: React.FC<TagManagementProps> = ({
               >
                 取消
               </Button>
-            )}
-          </div>
-          <div className={styles.messageBar}>
-            {error && (
-              <MessageBar intent="error">
-                <MessageBarBody>{error}</MessageBarBody>
-              </MessageBar>
-            )}
-            {success && (
-              <MessageBar intent="success">
-                <MessageBarBody>{success}</MessageBarBody>
-              </MessageBar>
             )}
           </div>
         </form>

@@ -18,6 +18,8 @@ import {
   Option,
 } from '@fluentui/react-components';
 import { TabContent } from './TabContent.tsx';
+import { NotificationProvider } from './NotificationContext.tsx';
+import * as tagApi from '../../wailsjs/go/services/TagServiceImpl.js';
 
 interface Category {
   id: number;
@@ -95,6 +97,20 @@ export const ContentManagement: React.FC = () => {
 
   const styles = useStyles();
 
+  React.useEffect(() => {
+    const loadTags = async () => {
+      try {
+        const response = await tagApi.List(1, 100, '');
+        if (response && response.data && response.data.data) {
+          setTags(response.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to load tags:', error);
+      }
+    };
+    loadTags();
+  }, []);
+
   const handleTabSelect = (event: SelectTabEvent, data: SelectTabData) => {
     setSelectedTab(data.value);
   };
@@ -132,27 +148,29 @@ export const ContentManagement: React.FC = () => {
   };
 
   return (
-    <div className={`${styles.stack} w-[780px] h-[480px]`}>
-      <Card
-        className={`${styles.card} p-5 flex flex-col w-full h-full overflow-auto`}
-      >
-        <CardHeader header={<Title1>内容管理</Title1>} />
-        <TabList selectedValue={selectedTab} onTabSelect={handleTabSelect}>
-          <Tab value="notes">笔记管理</Tab>
-          <Tab value="categories">分类管理</Tab>
-          <Tab value="tags">标签管理</Tab>
-        </TabList>
+    <NotificationProvider>
+      <div className={`${styles.stack} w-[780px] h-[480px]`}>
+        <Card
+          className={`${styles.card} p-5 flex flex-col w-full h-full overflow-auto`}
+        >
+          <CardHeader header={<Title1>内容管理</Title1>} />
+          <TabList selectedValue={selectedTab} onTabSelect={handleTabSelect}>
+            <Tab value="notes">笔记管理</Tab>
+            <Tab value="categories">分类管理</Tab>
+            <Tab value="tags">标签管理</Tab>
+          </TabList>
 
-        <TabContent
-          selectedTab={selectedTab}
-          notes={notes}
-          categories={categories}
-          tags={tags}
-          onNotesChange={setNotes}
-          onCategoriesChange={setCategories}
-          onTagsChange={setTags}
-        />
-      </Card>
-    </div>
+          <TabContent
+            selectedTab={selectedTab}
+            notes={notes}
+            categories={categories}
+            tags={tags}
+            onNotesChange={setNotes}
+            onCategoriesChange={setCategories}
+            onTagsChange={setTags}
+          />
+        </Card>
+      </div>
+    </NotificationProvider>
   );
 };
