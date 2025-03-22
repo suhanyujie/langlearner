@@ -2,7 +2,6 @@ package services
 
 import (
 	"context"
-	"errors"
 	"math"
 	"strings"
 
@@ -28,18 +27,19 @@ func (s *TagServiceImpl) Start(ctx context.Context) {
 }
 
 // List returns a paginated list of tags
-func (s *TagServiceImpl) List(page, pageSize int, keyword string) (*types.TagList, error) {
+func (s *TagServiceImpl) List(page, pageSize int, keyword string) (resp types.JSResp) {
 	if page < 1 {
 		page = 1
 	}
 	if pageSize < 1 {
 		pageSize = 10
 	}
-
+	offset := (page - 1) * pageSize
 	// Get all tags from storage
-	tags, err := s.storage.List()
+	tags, err := s.storage.List(0, keyword, offset, pageSize)
 	if err != nil {
-		return nil, err
+		resp.Msg = err.Error()
+		return
 	}
 
 	// Filter tags by keyword
@@ -67,49 +67,67 @@ func (s *TagServiceImpl) List(page, pageSize int, keyword string) (*types.TagLis
 	} else {
 		data = []types.Tag{}
 	}
-
-	return &types.TagList{
+	resp.Success = 1
+	resp.Data = &types.TagList{
 		Total:       total,
 		TotalPages:  totalPages,
 		CurrentPage: page,
 		PageSize:    pageSize,
 		Data:        data,
-	}, nil
+	}
+	return
 }
 
 // Create creates a new tag
-func (s *TagServiceImpl) Create(name string) (*types.Tag, error) {
+func (s *TagServiceImpl) Create(name string) (resp types.JSResp) {
 	if name == "" {
-		return nil, errors.New("tag name cannot be empty")
+		resp.Msg = "tag name cannot be empty"
+		return
 	}
 
 	// Create new tag
 	newTag := &types.Tag{Name: name}
 	err := s.storage.Create(newTag)
 	if err != nil {
-		return nil, err
+		if strings.Contains(err.Error(), "UNIQUE constraint") {
+			resp.Msg = "标签已存在"
+			return
+		}
+		resp.Msg = err.Error()
+		return
 	}
-
-	return newTag, nil
+	resp.Success = 1
+	resp.Data = newTag
+	return
 }
 
 // Update updates an existing tag
-func (s *TagServiceImpl) Update(id int, name string) (*types.Tag, error) {
+func (s *TagServiceImpl) Update(id int, name string) (resp types.JSResp) {
 	if name == "" {
-		return nil, errors.New("tag name cannot be empty")
+		resp.Msg = "tag name cannot be empty"
+		return
 	}
 
 	// Update tag
 	updatedTag := &types.Tag{ID: id, Name: name}
 	err := s.storage.Update(updatedTag)
 	if err != nil {
-		return nil, err
+		resp.Msg = err.Error()
+		return
 	}
-
-	return updatedTag, nil
+	resp.Success = 1
+	resp.Data = updatedTag
+	return
 }
 
 // Delete deletes a tag
-func (s *TagServiceImpl) Delete(id int) error {
-	return s.storage.Delete(id)
+func (s *TagServiceImpl) Delete(id int) (resp types.JSResp) {
+	err := s.storage.Delete(id)
+	if err != nil {
+		resp.Msg = err.Error()
+		return
+	}
+
+	resp.Success = 1
+	return
 }

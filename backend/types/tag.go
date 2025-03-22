@@ -3,7 +3,7 @@ package types
 // Tag represents a tag entity
 type Tag struct {
 	ID   int    `json:"id" gorm:"primaryKey"`
-	Name string `json:"name" gorm:"uniqueIndex;not null"`
+	Name string `json:"name" gorm:"type:varchar(100);uniqueIndex;not null"`
 }
 
 // TableName specifies the table name for Tag model
@@ -23,11 +23,11 @@ type TagList struct {
 // TagService defines the interface for tag operations
 type TagService interface {
 	// List returns a paginated list of tags
-	List(page, pageSize int, keyword string) (*TagList, error)
+	List(page, pageSize int, keyword string) JSResp
 	// Create creates a new tag
-	Create(name string) (*Tag, error)
+	Create(name string) JSResp
 	// Update updates an existing tag
-	Update(id int, name string) (*Tag, error)
+	Update(id int, name string) JSResp
 	// Delete deletes a tag
-	Delete(id int) error
+	Delete(id int) JSResp
 }

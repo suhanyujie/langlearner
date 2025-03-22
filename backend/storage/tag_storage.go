@@ -6,8 +6,8 @@ import (
 
 // TagStorage defines the interface for tag data persistence
 type TagStorage interface {
-	// List returns all tags
-	List() ([]types.Tag, error)
+	// List returns tags with optional id and keyword filters, supports pagination
+	List(id int, keyword string, offset int, limit int) ([]types.Tag, error)
 	// Create creates a new tag
 	Create(tag *types.Tag) error
 	// Update updates an existing tag
@@ -29,7 +29,7 @@ func NewMemoryTagStorage() TagStorage {
 }
 
 // List returns all tags
-func (s *MemoryTagStorage) List() ([]types.Tag, error) {
+func (s *MemoryTagStorage) List(id int, keyword string, offset int, limit int) ([]types.Tag, error) {
 	return s.tags, nil
 }
 

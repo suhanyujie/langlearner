@@ -21,7 +21,7 @@ func main() {
 	}
 
 	// Create an instance of the app structure
-	app := NewApp()
+	// app := services.NewApp()
 
 	tagSvc := services.NewTagService()
 	// Create application with options
@@ -37,7 +37,7 @@ func main() {
 			tagSvc.(*(services.TagServiceImpl)).Start(ctx)
 		},
 		Bind: []interface{}{
-			app,
+			tagSvc,
 		},
 	})
 

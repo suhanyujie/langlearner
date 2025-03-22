@@ -1,7 +1,8 @@
 import * as React from 'react';
 import { TabValue } from '@fluentui/react-components';
 import { NoteManagement } from './NoteManagement.tsx';
-import { CategoryAndTagManagement } from './CategoryAndTagManagement.tsx';
+import { CategoryManagement } from './CategoryManagement.tsx';
+import { TagManagement } from './TagManagement.tsx';
 
 interface Category {
   id: number;
@@ -50,24 +51,18 @@ export const TabContent: React.FC<TabContentProps> = ({
           categories={categories}
           tags={tags}
           onNotesChange={onNotesChange}
+          onTagsChange={onTagsChange}
         />
       );
     case 'categories':
       return (
-        <CategoryAndTagManagement
-          type="categories"
-          items={categories}
-          onItemsChange={onCategoriesChange}
+        <CategoryManagement
+          categories={categories}
+          onCategoriesChange={onCategoriesChange}
         />
       );
     case 'tags':
-      return (
-        <CategoryAndTagManagement
-          type="tags"
-          items={tags}
-          onItemsChange={onTagsChange}
-        />
-      );
+      return <TagManagement tags={tags} onTagsChange={onTagsChange} />;
     default:
       return null;
   }

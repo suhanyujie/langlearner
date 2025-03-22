@@ -9,6 +9,7 @@ import {
   Combobox,
   Option,
 } from '@fluentui/react-components';
+import * as tagApi from '../../wailsjs/go/services/TagServiceImpl.js';
 
 interface Category {
   id: number;
@@ -35,6 +36,7 @@ interface NoteManagementProps {
   categories: Category[];
   tags: Tag[];
   onNotesChange: (notes: Note[]) => void;
+  onTagsChange: (tags: Tag[]) => void;
 }
 
 const useStyles = makeStyles({
@@ -69,6 +71,7 @@ export const NoteManagement: React.FC<NoteManagementProps> = ({
   categories,
   tags,
   onNotesChange,
+  onTagsChange,
 }) => {
   const [currentNote, setCurrentNote] = React.useState<Note>({
     id: 0,
@@ -77,6 +80,21 @@ export const NoteManagement: React.FC<NoteManagementProps> = ({
     categories: [],
     tags: [],
   });
+
+  React.useEffect(() => {
+    // 加载标签列表
+    const loadTags = async () => {
+      try {
+        const response = await tagApi.List(1, 100, '');
+        if (response && response.Data) {
+          // onTagsChange(response.Data);
+        }
+      } catch (error) {
+        console.error('Failed to load tags:', error);
+      }
+    };
+    loadTags();
+  }, []);
 
   const styles = useStyles();
 
