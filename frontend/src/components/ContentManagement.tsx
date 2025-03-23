@@ -86,7 +86,6 @@ export const ContentManagement: React.FC = () => {
   const [selectedTab, setSelectedTab] = React.useState<TabValue>('notes');
   const [notes, setNotes] = React.useState<Note[]>([]);
   const [categories, setCategories] = React.useState<Category[]>([]);
-  const [tags, setTags] = React.useState<Tag[]>([]);
   const [currentNote, setCurrentNote] = React.useState<Note>({
     id: 0,
     front: '',
@@ -96,20 +95,6 @@ export const ContentManagement: React.FC = () => {
   });
 
   const styles = useStyles();
-
-  React.useEffect(() => {
-    const loadTags = async () => {
-      try {
-        const response = await tagApi.List(1, 100, '');
-        if (response && response.data && response.data.data) {
-          setTags(response.data.data);
-        }
-      } catch (error) {
-        console.error('Failed to load tags:', error);
-      }
-    };
-    loadTags();
-  }, []);
 
   const handleTabSelect = (event: SelectTabEvent, data: SelectTabData) => {
     setSelectedTab(data.value);
@@ -148,7 +133,6 @@ export const ContentManagement: React.FC = () => {
   };
 
   return (
-    <NotificationProvider>
       <div className={`${styles.stack} w-[780px] h-[480px]`}>
         <Card
           className={`${styles.card} p-5 flex flex-col w-full h-full overflow-auto`}
@@ -157,20 +141,16 @@ export const ContentManagement: React.FC = () => {
           <TabList selectedValue={selectedTab} onTabSelect={handleTabSelect}>
             <Tab value="notes">笔记管理</Tab>
             <Tab value="categories">分类管理</Tab>
-            <Tab value="tags">标签管理</Tab>
           </TabList>
 
           <TabContent
             selectedTab={selectedTab}
             notes={notes}
             categories={categories}
-            tags={tags}
             onNotesChange={setNotes}
             onCategoriesChange={setCategories}
-            onTagsChange={setTags}
           />
         </Card>
       </div>
-    </NotificationProvider>
   );
 };

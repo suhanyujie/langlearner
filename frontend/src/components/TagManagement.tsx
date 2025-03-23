@@ -17,10 +17,7 @@ interface Tag {
   name: string;
 }
 
-interface TagManagementProps {
-  tags: Tag[];
-  onTagsChange: (tags: Tag[]) => void;
-}
+interface TagManagementProps {}
 
 const useStyles = makeStyles({
   container: {
@@ -72,29 +69,14 @@ const useStyles = makeStyles({
   },
 });
 
-export const TagManagement: React.FC<TagManagementProps> = ({
-  tags,
-  onTagsChange,
-}) => {
+export const TagManagement: React.FC<TagManagementProps> = ({}) => {
   const [newTagName, setNewTagName] = React.useState('');
+  const [tags, setTags] = React.useState<Tag[]>([]);
   const [nextId, setNextId] = React.useState(1);
-  const [editingTagName, setEditingTag] = React.useState<string | null>(null);
+  const [editingTagName, setEditingTagName] = React.useState<string | null>(
+    null
+  );
   const { showNotification } = useNotification();
-
-  // React.useEffect(() => {
-  //   let timer: NodeJS.Timeout;
-  //   if (error || success) {
-  //     timer = setTimeout(() => {
-  //       setError(null);
-  //       setSuccess(null);
-  //     }, 3000);
-  //   }
-  //   return () => {
-  //     if (timer) {
-  //       clearTimeout(timer);
-  //     }
-  //   };
-  // }, [error, success]);
 
   const styles = useStyles();
 
@@ -104,7 +86,8 @@ export const TagManagement: React.FC<TagManagementProps> = ({
   };
 
   const deleteTag = async (id: number) => {
-    await tagApi.Delete(id);
+    const resp = await tagApi.Delete(id);
+    return resp;
   };
 
   const handleSubmit = (event: React.FormEvent) => {
@@ -112,7 +95,7 @@ export const TagManagement: React.FC<TagManagementProps> = ({
     if (!newTagName.trim()) return;
 
     if (editingTagName) {
-      onTagsChange(
+      setTags(
         tags.map((tag) =>
           tag.name === editingTagName ? { ...tag, name: newTagName } : tag
         )
@@ -128,21 +111,42 @@ export const TagManagement: React.FC<TagManagementProps> = ({
         const newTag = { id: data.data.id, name: newTagName };
         showNotification('success', '标签创建成功');
         setNewTagName('');
-        setEditingTag(null);
-        onTagsChange([...tags, newTag]);
+        setEditingTagName(null);
+        setTags([...tags, newTag]);
       });
     }
   };
 
   const handleEdit = (tag: Tag) => {
     setNewTagName(tag.name);
-    setEditingTag(tag.name);
+    setEditingTagName(tag.name);
   };
 
   const handleDelete = (tag: Tag) => {
-    deleteTag(tag.id);
-    onTagsChange(tags.filter((t) => t.id !== tag.id));
+    deleteTag(tag.id).then((data) => {
+      if (data.hasOwnProperty('success') && data['success'] === 0) {
+        showNotification('error', data['msg']);
+        return;
+      }
+      showNotification('success', '标签删除成功');
+      const updatedTags = tags.filter((t) => t.id !== tag.id);
+      setTags(updatedTags);
+    });
   };
+
+  React.useEffect(() => {
+    const loadTags = async () => {
+      try {
+        const response = await tagApi.List(1, 100, '');
+        if (response && response.data && response.data.data) {
+          setTags(response.data.data);
+        }
+      } catch (error) {
+        console.error('Failed to load tags:', error);
+      }
+    };
+    loadTags();
+  }, []);
 
   return (
     <div className={styles.container}>
@@ -163,7 +167,7 @@ export const TagManagement: React.FC<TagManagementProps> = ({
               <Button
                 onClick={() => {
                   setNewTagName('');
-                  setEditingTag(null);
+                  setEditingTagName(null);
                 }}
               >
                 取消

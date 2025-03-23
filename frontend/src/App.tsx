@@ -1,6 +1,8 @@
 import './App.css';
 import { SpeakingPractice } from './components/SpeakingPractice.tsx';
 import { ContentManagement } from './components/ContentManagement.tsx';
+import { TagManagement } from './components/TagManagement.tsx';
+import { NotificationProvider } from './components/NotificationContext.tsx';
 import {
   BrowserRouter,
   Routes,
@@ -35,6 +37,16 @@ function Navigation() {
             内容管理
           </Button>
         </Link>
+        <Link to="/tag-management">
+          <Button
+            appearance={
+              location.pathname === '/tag-management' ? 'primary' : 'secondary'
+            }
+            className="text-white"
+          >
+            标签管理
+          </Button>
+        </Link>
       </div>
     </nav>
   );
@@ -46,10 +58,16 @@ function App() {
       <div id="App" className="flex flex-col min-h-screen">
         <Navigation />
         <div className="flex-1 flex justify-center items-center">
-          <Routes>
-            <Route path="/" element={<SpeakingPractice />} />
-            <Route path="/content-management" element={<ContentManagement />} />
-          </Routes>
+          <NotificationProvider>
+            <Routes>
+              <Route path="/" element={<SpeakingPractice />} />
+              <Route
+                path="/content-management"
+                element={<ContentManagement />}
+              />
+              <Route path="/tag-management" element={<TagManagement />} />
+            </Routes>
+          </NotificationProvider>
         </div>
       </div>
     </BrowserRouter>

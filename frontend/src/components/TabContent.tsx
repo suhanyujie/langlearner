@@ -3,6 +3,7 @@ import { TabValue } from '@fluentui/react-components';
 import { NoteManagement } from './NoteManagement.tsx';
 import { CategoryManagement } from './CategoryManagement.tsx';
 import { TagManagement } from './TagManagement.tsx';
+import * as tagApi from '../../wailsjs/go/services/TagServiceImpl.js';
 
 interface Category {
   id: number;
@@ -28,30 +29,38 @@ interface TabContentProps {
   selectedTab: TabValue;
   notes: Note[];
   categories: Category[];
-  tags: Tag[];
   onNotesChange: (notes: Note[]) => void;
   onCategoriesChange: (categories: Category[]) => void;
-  onTagsChange: (tags: Tag[]) => void;
 }
 
 export const TabContent: React.FC<TabContentProps> = ({
   selectedTab,
   notes,
   categories,
-  tags,
   onNotesChange,
   onCategoriesChange,
-  onTagsChange,
 }) => {
+  React.useEffect(() => {
+    if (selectedTab === 'tags') {
+      const loadTags = async () => {
+        try {
+          const response = await tagApi.List(1, 100, '');
+          if (response && response.data && response.data.data) {
+          }
+        } catch (error) {
+          console.error('Failed to load tags:', error);
+        }
+      };
+      loadTags();
+    }
+  }, [selectedTab]);
   switch (selectedTab) {
     case 'notes':
       return (
         <NoteManagement
           notes={notes}
           categories={categories}
-          tags={tags}
           onNotesChange={onNotesChange}
-          onTagsChange={onTagsChange}
         />
       );
     case 'categories':
@@ -61,8 +70,8 @@ export const TabContent: React.FC<TabContentProps> = ({
           onCategoriesChange={onCategoriesChange}
         />
       );
-    case 'tags':
-      return <TagManagement tags={tags} onTagsChange={onTagsChange} />;
+    // case 'tags':
+    //   return <TagManagement />;
     default:
       return null;
   }

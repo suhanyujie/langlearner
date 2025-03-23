@@ -34,9 +34,7 @@ interface Note {
 interface NoteManagementProps {
   notes: Note[];
   categories: Category[];
-  tags: Tag[];
   onNotesChange: (notes: Note[]) => void;
-  onTagsChange: (tags: Tag[]) => void;
 }
 
 const useStyles = makeStyles({
@@ -69,9 +67,7 @@ const useStyles = makeStyles({
 export const NoteManagement: React.FC<NoteManagementProps> = ({
   notes,
   categories,
-  tags,
   onNotesChange,
-  onTagsChange,
 }) => {
   const [currentNote, setCurrentNote] = React.useState<Note>({
     id: 0,
@@ -80,21 +76,6 @@ export const NoteManagement: React.FC<NoteManagementProps> = ({
     categories: [],
     tags: [],
   });
-
-  React.useEffect(() => {
-    // 加载标签列表
-    const loadTags = async () => {
-      try {
-        const response = await tagApi.List(1, 100, '');
-        if (response && response.Data) {
-          // onTagsChange(response.Data);
-        }
-      } catch (error) {
-        console.error('Failed to load tags:', error);
-      }
-    };
-    loadTags();
-  }, []);
 
   const styles = useStyles();
 
@@ -174,26 +155,7 @@ export const NoteManagement: React.FC<NoteManagementProps> = ({
               </Option>
             ))}
           </Combobox>
-          <Combobox
-            multiselect
-            placeholder="选择标签"
-            selectedOptions={currentNote.tags?.map((t) => t.name) || []}
-            onOptionSelect={(e, data) => {
-              const selectedTags = tags.filter((t) =>
-                data.selectedOptions.includes(t.name)
-              );
-              setCurrentNote((prev) => ({
-                ...prev,
-                tags: selectedTags,
-              }));
-            }}
-          >
-            {tags.map((tag) => (
-              <Option key={tag.id} value={tag.name}>
-                {tag.name}
-              </Option>
-            ))}
-          </Combobox>
+   
         </div>
         <div className={styles.buttonGroup}>
           <Button type="submit" appearance="primary">
