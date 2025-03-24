@@ -16,7 +16,7 @@ type TagServiceImpl struct {
 }
 
 // NewTagService creates a new instance of TagService
-func NewTagService() types.TagService {
+func NewTagService() types.TagServiceIf {
 	return &TagServiceImpl{
 		storage: storage.NewSQLiteTagStorage(),
 	}

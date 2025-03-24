@@ -36,7 +36,7 @@ func InitDB(dbPath string) error {
 		DB = db
 
 		// Auto migrate database schemas
-		if err := DB.AutoMigrate(&types.Tag{}); err != nil {
+		if err := DB.AutoMigrate(&types.Tag{}, &types.Note{}); err != nil {
 			initErr = err
 			return
 		}

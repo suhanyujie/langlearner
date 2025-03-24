@@ -20,14 +20,26 @@ type TagList struct {
 	Data        []Tag `json:"data"`
 }
 
-// TagService defines the interface for tag operations
-type TagService interface {
+// TagServiceIf defines the interface for tag operations
+type TagServiceIf interface {
 	// List returns a paginated list of tags
 	List(page, pageSize int, keyword string) JSResp
 	// Create creates a new tag
 	Create(name string) JSResp
 	// Update updates an existing tag
 	Update(id int, name string) JSResp
+	// Delete deletes a tag
+	Delete(id int) JSResp
+}
+
+// NoteServiceIf defines the interface for tag operations
+type NoteServiceIf interface {
+	// List returns a paginated list of tags
+	List(page, pageSize int, keyword string) JSResp
+	// Create creates a new tag
+	Create(name string) JSResp
+	// Update updates an existing tag
+	Update(id int, frontCont, backCont string) JSResp
 	// Delete deletes a tag
 	Delete(id int) JSResp
 }
