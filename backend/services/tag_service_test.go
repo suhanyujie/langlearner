@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -116,13 +117,11 @@ func TestList(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			mockStorage.On("List", 0, tt.keyword, (tt.page-1)*tt.pageSize, tt.pageSize).Return(tt.mockTags, tt.mockErr)
-			result, err := service.List(tt.page, tt.pageSize, tt.keyword)
+			result := service.List(tt.page, tt.pageSize, tt.keyword)
 
-			if err != nil {
-				assert.Error(t, err)
-				assert.Equal(t, tt.expErr.Error(), err.Error())
+			if result.Success != 1 {
+				assert.Equal(t, tt.expErr.Error(), result.Msg)
 			} else {
-				assert.NoError(t, err)
 				assert.Equal(t, tt.expected, result)
 			}
 			mockStorage.AssertExpectations(t)
@@ -176,16 +175,21 @@ func TestCreate(t *testing.T) {
 				mockStorage.On("Create", tmpData).Return(tt.mockErr)
 			}
 
-			result, err := service.Create(tt.tagName)
+			result := service.Create(tt.tagName)
 
-			if err != nil {
-				assert.Error(t, err)
-				assert.Equal(t, tt.expErr.Error(), err.Error())
+			if result.Success != 1 {
+				assert.Equal(t, tt.expErr.Error(), result.Msg)
 			} else {
-				assert.NoError(t, err)
 				assert.Equal(t, tt.expected, result)
 			}
 			mockStorage.AssertExpectations(t)
 		})
 	}
+}
+
+func TestFn1(t *testing.T) {
+	for i := 0; i < 4; i++ {
+		defer fmt.Println(i)
+	}
+	fmt.Println("end...")
 }
