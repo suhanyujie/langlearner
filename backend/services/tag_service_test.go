@@ -193,3 +193,12 @@ func TestFn1(t *testing.T) {
 	}
 	fmt.Println("end...")
 }
+
+func TestFn2(t *testing.T) {
+	for i := 0; i < 4; i++ {
+		defer fmt.Println(i)
+	}
+	c1 := make(chan int)
+	c1 <- 1 // 这里发生阻塞
+	fmt.Println("end...")
+}
